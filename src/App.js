@@ -1,54 +1,58 @@
 import './App.css';
 import React, { useState } from 'react';
-import Person from './components/Person/Person';
+
+
 
 function App() {
-  const [person, setPersons] = useState([
-    { name: "huy1", age: "2" },
-    { name: "huy2", age: "5" },
-    { name: "huy3", age: "6" }
-  ]);
-  const [isShowPerson, setIsShowPerson] = useState(true);
+  const [jobs, setJobs] = useState(() => (
+    JSON.parse(localStorage.getItem("jobs")) ?? []
+  ));
+  const [job, setJob] = useState();
 
-  const switchNameHandler = (event, index) => {
-    let newPerson = [...person];
-    newPerson[index].name = event.target.value;
-    setPersons(newPerson);
+  const handleAddJob = () => {
+    let newJobs = [...jobs, job];
+    setJobs(newJobs);
+    setJob('');
+    localStorage.setItem("jobs", JSON.stringify(newJobs));
   }
 
-  const toggleNameHandler = () => {
-    setIsShowPerson(!isShowPerson);
+  const ClearJobs = () => {
+    setJob('');
+    setJobs([]);
+    localStorage.removeItem("jobs");
   }
 
-  const deletePersonHandler = (indexPerson) =>{
-    let newPerson = [...person];
-    newPerson.splice(indexPerson, 1);
-    setPersons(newPerson);
+  const RemoveJob = (job) => {
+    let newJobs = jobs.filter((item) => (
+      item !== job
+    ));
+    setJobs(newJobs);
+    localStorage.setItem("jobs", JSON.stringify(newJobs));
   }
 
   return (
     <>
-      <div className="App">
-        First app react
+      <div style={{ padding: 30 }}>
+        <input value={job} onChange={e => setJob(e.target.value)}></input>
+        <button onClick={handleAddJob} style={{ marginLeft: 30, backgroundColor: 'greenyellow' }}>Add</button>
+        <button onClick={ClearJobs} style={{ marginLeft: 30, backgroundColor: 'greenyellow' }}>Clear</button>
       </div>
-      <button onClick={() => toggleNameHandler()}>toggle name</button>
+      <ul>
+        {
+          jobs.map((item, index) => (
+            <div key={index}>
+              <li>
+                {item}
+                <button onClick={() => RemoveJob(item)}>x</button>
+              </li>
+              
+            </div>
+          ))
+        }
 
-      {
-        isShowPerson ? (
-          <>
-            {
-              person.map((item, index ) => {
-                return (
-                  <Person key={index} change={(e)=>switchNameHandler(e, index)} 
-                  click={() => deletePersonHandler(index)} name={item.name} age={item.age}>  
-                  </Person>)
-              })
-            }
-          </>
-        ) : null
-      }
+      </ul>
     </>
-  );
+  )
 }
 
 export default App
